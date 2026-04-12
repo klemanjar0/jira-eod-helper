@@ -12,4 +12,5 @@ export interface UserSettings {
   is_using_master_key: boolean;
   updated_at: string;
   api_key: string;
+  assignee_is_current_user: boolean;
 }

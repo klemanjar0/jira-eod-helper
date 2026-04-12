@@ -46,9 +46,14 @@ export async function getTickets(query?: string): Promise<TicketResponse> {
     jqlArray.push(`AND (key ~ "${escaped}" OR summary ~ "${escaped}")`);
   }
 
-  const assignTo = `AND assignee="${escapedForJira(assignee)}"`;
+  const assignTo = userSettings.assignee_is_current_user
+    ? `AND assignee=currentUser()`
+    : `AND assignee="${escapedForJira(assignee)}"`;
 
-  jqlArray.push(assignTo, escapedForJira(issueQuery));
+  const issueQueryResult = issueQuery.split(",").join(" AND ");
+  const finalIssueQuery = `AND ${issueQueryResult} order by key DESC`;
+
+  jqlArray.push(assignTo, escapedForJira(finalIssueQuery));
 
   const jql = jqlArray.filter(Boolean).join(" ");
 

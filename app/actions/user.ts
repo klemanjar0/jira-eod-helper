@@ -34,7 +34,9 @@ export async function buildJiraAuth(): Promise<string | null> {
 
   const settings = await getUserSettings(user.id);
   if (!settings) {
-    log.warn("jira", "buildJiraAuth: no settings row", { userId: user.id });
+    log.warn("jira", "buildJiraAuth: no settings row", {
+      userId: user.id,
+    });
     return null;
   }
 
@@ -164,18 +166,26 @@ export async function updateUserSettings(
   }
 
   if (!settings || typeof settings !== "object") {
-    log.warn("db", "updateUserSettings: settings payload is not an object", {
-      userId,
-      type: typeof settings,
-    });
+    log.warn(
+      "db",
+      "updateUserSettings: settings payload is not an object",
+      {
+        userId,
+        type: typeof settings,
+      },
+    );
     return null;
   }
 
   const fields = Object.keys(settings);
   if (fields.length === 0) {
-    log.warn("db", "updateUserSettings: empty payload, nothing to update", {
-      userId,
-    });
+    log.warn(
+      "db",
+      "updateUserSettings: empty payload, nothing to update",
+      {
+        userId,
+      },
+    );
     return null;
   }
 
@@ -184,7 +194,9 @@ export async function updateUserSettings(
   // clearer log line and avoids a needless round-trip.
   const current = await getCurrentUser();
   if (!current) {
-    log.warn("db", "updateUserSettings: no authenticated user", { userId });
+    log.warn("db", "updateUserSettings: no authenticated user", {
+      userId,
+    });
     return null;
   }
   if (current.id !== userId) {

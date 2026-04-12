@@ -10,8 +10,7 @@ Best Regards,
 const defaultTicketTemplate = `
 	[%{key}] - %{summary}`;
 
-const defaultQuery =
-    "AND status!=Closed AND status!=Testing order by key DESC",
+const defaultQuery = "status!=Closed,status!=Testing",
   defaultSubject = "Developer FE;myTI",
   defaultMailRecipient = "my.eod@trialinteractive.com",
   defaultAssignee = "AND assignee = currentUser()";
