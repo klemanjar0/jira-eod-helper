@@ -4,14 +4,17 @@ import TicketItem from "@/app/(tabs)/tickets/components/TicketItem";
 import { Ticket } from "@/app/models/ticket";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
+import { SearchBar } from "@/app/(tabs)/tickets/components/SearchBar";
 
-export default async function TicketsPage() {
-  const res = await getTickets();
+export default async function TicketsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { q } = await searchParams;
+  const query = typeof q === "string" ? q : undefined;
+  const res = await getTickets(query);
   const tickets: Ticket[] = res.tickets;
-
-  const renderHeader = () => {
-    return <></>;
-  };
 
   const renderTicket = (item: Ticket) => (
     <TicketItem item={item} key={item.id} />
@@ -26,7 +29,7 @@ export default async function TicketsPage() {
         flex: 1,
       }}
     >
-      {renderHeader()}
+      <SearchBar />
 
       {tickets.length === 0 ? (
         <Box

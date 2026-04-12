@@ -25,7 +25,7 @@ const JIRA_FIELDS = [
 const JIRA_PAGE_SIZE = 100;
 const JIRA_MAX_PAGES = 50; // hard safety cap: 50 * 100 = 5000 issues
 
-export async function getTickets(): Promise<TicketResponse> {
+export async function getTickets(query?: string): Promise<TicketResponse> {
   const user = await getCurrentUser();
   if (!user) throw new Error("User not authenticated");
 
@@ -39,9 +39,19 @@ export async function getTickets(): Promise<TicketResponse> {
   } = userSettings;
   if (!projectId) throw new Error("Project ID is not set");
 
-  const jql = [`project=${projectId}`, assignee, issueQuery]
-    .filter(Boolean)
-    .join(" ");
+  const jqlArray = [`project=${projectId}`];
+
+  if (query) {
+    const escaped = query
+      .trim()
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"');
+    jqlArray.push(`AND (key ~ "${escaped}" OR summary ~ "${escaped}")`);
+  }
+
+  jqlArray.push(assignee, issueQuery);
+
+  const jql = jqlArray.filter(Boolean).join(" ");
 
   const authString = await buildJiraAuth();
   if (!authString) throw new Error("Failed to build Jira auth header");
@@ -222,9 +232,7 @@ export async function getTicketDetails(
 
   const fields = raw.fields ?? {};
 
-  const comments: TicketComment[] = (
-    fields.comment?.comments ?? []
-  ).map(
+  const comments: TicketComment[] = (fields.comment?.comments ?? []).map(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (c: any) => ({
       id: c.id ?? "",

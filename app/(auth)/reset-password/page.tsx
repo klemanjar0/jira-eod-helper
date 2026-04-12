@@ -51,7 +51,11 @@ export default function ResetPasswordPage() {
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
             Set new password
           </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 3 }}
+          >
             Enter your new password below.
           </Typography>
 
