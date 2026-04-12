@@ -8,3 +8,7 @@ declare type AnyArray = any[];
 declare type Anything = any;
 
 declare type Nullable<T> = T | null;
+
+declare type SearchParams = Promise<{
+  [key: string]: string | string[] | undefined;
+}>;

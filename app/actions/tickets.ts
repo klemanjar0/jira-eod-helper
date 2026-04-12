@@ -13,7 +13,8 @@ import {
 } from "@/app/models/ticket";
 import { buildRequestOptions, callApi } from "@/app/lib/api";
 import { log } from "@/app/lib/logger";
-import { transformTickets } from "@/app/lib/utils";
+import { escapedForJira, transformTickets } from "@/app/lib/utils";
+import { escape } from "node:querystring";
 
 const JIRA_FIELDS = [
   "assignee",
@@ -40,16 +41,14 @@ export async function getTickets(query?: string): Promise<TicketResponse> {
   if (!projectId) throw new Error("Project ID is not set");
 
   const jqlArray = [`project=${projectId}`];
-
   if (query) {
-    const escaped = query
-      .trim()
-      .replace(/\\/g, "\\\\")
-      .replace(/"/g, '\\"');
+    const escaped = escapedForJira(query);
     jqlArray.push(`AND (key ~ "${escaped}" OR summary ~ "${escaped}")`);
   }
 
-  jqlArray.push(assignee, issueQuery);
+  const assignTo = `AND assignee="${escapedForJira(assignee)}"`;
+
+  jqlArray.push(assignTo, escapedForJira(issueQuery));
 
   const jql = jqlArray.filter(Boolean).join(" ");
 

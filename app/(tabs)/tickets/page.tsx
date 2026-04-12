@@ -9,7 +9,7 @@ import { SearchBar } from "@/app/(tabs)/tickets/components/SearchBar";
 export default async function TicketsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: SearchParams;
 }) {
   const { q } = await searchParams;
   const query = typeof q === "string" ? q : undefined;

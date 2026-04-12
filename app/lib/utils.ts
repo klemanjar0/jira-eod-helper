@@ -1,5 +1,6 @@
 import { RawTicket, Ticket } from "@/app/models/ticket";
 import { UserSettings } from "@/app/models/user";
+import { escape } from "node:querystring";
 
 export const TODAY_TICKET_KEY = "TODAY_TICKET_KEY";
 export const TOMORROW_TICKET_KEY = "TOMORROW_TICKET_KEY";
@@ -90,4 +91,14 @@ export const buildEmailURI = (payload: EmailURIPayload) => {
     encoded: result.href + encodeURIComponent(result.body),
     result,
   };
+};
+
+export const escapedForJira = (value?: string) => {
+  if (!value) return "";
+
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
+  //const escaped: string = encodeURIComponent(value.trim());
+
+  //return escaped.replace(/%/gi, "\\\\u0025");
 };
