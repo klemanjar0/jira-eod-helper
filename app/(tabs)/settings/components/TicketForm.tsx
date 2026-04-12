@@ -34,6 +34,7 @@ const TicketForm: React.FC<Props> = ({ userId, initialSettings }) => {
 
     startTransition(async () => {
       await updateUserSettings(userId, {
+        ...initialSettings,
         content_template: contentTemplate,
         ticket_item_template: ticketItemTemplate,
       });
