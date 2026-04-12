@@ -81,8 +81,7 @@ const EmailForm: React.FC<Props> = ({ settings, initialDate, userId }) => {
         display: "flex",
         flexDirection: "column",
         flex: 1,
-        padding: 2,
-        backgroundColor: "#262626",
+        padding: 1,
         maxWidth: MAX_WIDTH,
         margin: "auto",
       }}
@@ -112,18 +111,28 @@ const EmailForm: React.FC<Props> = ({ settings, initialDate, userId }) => {
         </Button>
       </Stack>
 
-      <Stack direction="row" sx={{ gap: 1, mb: 1 }}>
-        <CalendarMonthIcon color="primary" />
-        <Typography color="primary" sx={{ fontWeight: "bold" }}>
-          Email Date
-        </Typography>
+      <Stack
+        direction="row"
+        sx={{
+          gap: 1,
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <Stack direction="row" sx={{ gap: 1, mb: 1 }}>
+          <CalendarMonthIcon color="primary" />
+          <Typography color="primary" sx={{ fontWeight: "bold" }}>
+            Email Date
+          </Typography>
+        </Stack>
+        <TextField
+          onChange={onDateChanged}
+          value={date}
+          variant="outlined"
+          type="date"
+          size="small"
+        />
       </Stack>
-      <TextField
-        onChange={onDateChanged}
-        value={date}
-        variant="outlined"
-        type="date"
-      />
 
       <Stack sx={{ my: 2 }}>
         <Stack direction="row" sx={{ gap: 1, mb: 1 }}>

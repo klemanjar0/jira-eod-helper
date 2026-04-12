@@ -24,6 +24,7 @@ export function SearchBar() {
       label="Search Issues"
       type="search"
       fullWidth
+      size="small"
       sx={{ my: 2 }}
       defaultValue={searchParams.get("q") ?? ""}
       onChange={(e) => handleSearch(e.target.value)}
