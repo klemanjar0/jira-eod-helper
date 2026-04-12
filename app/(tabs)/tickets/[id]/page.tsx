@@ -65,7 +65,15 @@ export default async function TicketDetailsPage({ params }: PageProps) {
     <Box
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
-      <AppBar position="static" sx={{ borderRadius: 0 }}>
+      <AppBar
+        position="static"
+        sx={{
+          borderRadius: 16,
+          marginTop: 1,
+          borderColor: "primary",
+          borderWidth: 1,
+        }}
+      >
         <Toolbar>
           <IconButton
             edge="start"
@@ -76,7 +84,7 @@ export default async function TicketDetailsPage({ params }: PageProps) {
             <ArrowBackIcon />
           </IconButton>
           <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-            Details
+            {details?.key} Details
           </Typography>
         </Toolbar>
       </AppBar>
