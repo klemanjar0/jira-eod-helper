@@ -4,6 +4,7 @@ import { createClient } from "@/app/lib/supabase/server";
 import { log } from "@/app/lib/logger";
 import type { UserSettings } from "@/app/models/user";
 import { User } from "@supabase/auth-js";
+import { z } from "zod";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -11,6 +12,24 @@ const UUID_RE =
 function isValidUserId(userId: unknown): userId is string {
   return typeof userId === "string" && UUID_RE.test(userId);
 }
+
+const userSettingsUpdateSchema = z
+  .object({
+    project_id: z.string(),
+    issue_query: z.string(),
+    content_template: z.string(),
+    ticket_item_template: z.string(),
+    mail_recipient: z.string(),
+    mail_subject: z.string(),
+    mail_author: z.string(),
+    assignee: z.string(),
+    username: z.string(),
+    is_using_master_key: z.boolean(),
+    api_key: z.string(),
+    assignee_is_current_user: z.boolean(),
+  })
+  .partial()
+  .strict();
 
 /**
  * Builds a Jira Basic auth header for the current user.
@@ -165,19 +184,16 @@ export async function updateUserSettings(
     return null;
   }
 
-  if (!settings || typeof settings !== "object") {
-    log.warn(
-      "db",
-      "updateUserSettings: settings payload is not an object",
-      {
-        userId,
-        type: typeof settings,
-      },
-    );
+  const parsed = userSettingsUpdateSchema.safeParse(settings);
+  if (!parsed.success) {
+    log.warn("db", "updateUserSettings: invalid settings payload", {
+      userId,
+      errors: JSON.stringify(parsed.error.flatten()),
+    });
     return null;
   }
 
-  const fields = Object.keys(settings);
+  const fields = Object.keys(parsed.data);
   if (fields.length === 0) {
     log.warn(
       "db",
@@ -215,7 +231,7 @@ export async function updateUserSettings(
       .from("user_settings")
       .upsert({
         user_id: userId,
-        ...settings,
+        ...parsed.data,
         updated_at: new Date().toISOString(),
       })
       .select()

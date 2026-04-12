@@ -1,6 +1,5 @@
 import { RawTicket, Ticket } from "@/app/models/ticket";
 import { UserSettings } from "@/app/models/user";
-import { escape } from "node:querystring";
 
 export const TODAY_TICKET_KEY = "TODAY_TICKET_KEY";
 export const TOMORROW_TICKET_KEY = "TOMORROW_TICKET_KEY";

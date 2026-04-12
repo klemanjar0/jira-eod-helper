@@ -18,10 +18,13 @@ export const buildRequestOptions = (
       "API URL is not set. Please set NEXT_PUBLIC_API_URL in .env.local",
     );
 
-  let finalUrl = [baseUrl, url].join("/");
-  if (options.query) finalUrl = [finalUrl, options.query].join("?");
+  const base = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const finalUrl = new URL(url, base);
+  if (options.query) {
+    options.query.forEach((value, key) => finalUrl.searchParams.set(key, value));
+  }
 
-  const request = new Request(finalUrl, {
+  const request = new Request(finalUrl.toString(), {
     method: options.method ?? "GET",
     headers: {
       "Content-Type": "application/json",
@@ -35,13 +38,10 @@ export const buildRequestOptions = (
   return request;
 };
 
-const enableNetworkDebug = true;
+const enableNetworkDebug = process.env.NODE_ENV === "development";
 export const callApi = (req: Request) => {
   if (enableNetworkDebug) {
-    log.debug("callApi", req.url, {
-      headers: req.headers,
-      body: req.body,
-    });
+    log.debug("callApi", req.url);
   }
   return fetch(req);
 };

@@ -14,7 +14,6 @@ import {
 import { buildRequestOptions, callApi } from "@/app/lib/api";
 import { log } from "@/app/lib/logger";
 import { escapedForJira, transformTickets } from "@/app/lib/utils";
-import { escape } from "node:querystring";
 
 const JIRA_FIELDS = [
   "assignee",

@@ -27,9 +27,13 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let user = null;
+  try {
+    const { data, error } = await supabase.auth.getUser();
+    if (!error) user = data.user;
+  } catch {
+    // Network or unexpected error — treat as unauthenticated
+  }
 
   const pathname = request.nextUrl.pathname;
   const isPublic = publicRoutes.some((route) => pathname.startsWith(route));

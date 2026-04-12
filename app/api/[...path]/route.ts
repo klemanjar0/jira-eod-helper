@@ -2,11 +2,17 @@ import { getServerConfig } from "@/app/lib/config";
 import { log } from "@/app/lib/logger";
 import { NextRequest, NextResponse } from "next/server";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+const ALLOWED_ORIGIN = process.env.NEXT_PUBLIC_APP_URL ?? "";
+
+function getCorsHeaders(requestOrigin: string | null): Record<string, string> {
+  const origin =
+    ALLOWED_ORIGIN && requestOrigin === ALLOWED_ORIGIN ? ALLOWED_ORIGIN : "";
+  return {
+    "Access-Control-Allow-Origin": origin,
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
+}
 
 function buildTargetUrl(request: NextRequest, path: string[]) {
   const { jiraHost } = getServerConfig();
@@ -85,8 +91,9 @@ async function proxyRequest(
     ms: `${ms}ms`,
   });
 
+  const corsHeaders = getCorsHeaders(request.headers.get("origin"));
   const responseHeaders = new Headers(response.headers);
-  Object.entries(CORS_HEADERS).forEach(([key, value]) =>
+  Object.entries(corsHeaders).forEach(([key, value]) =>
     responseHeaders.set(key, value),
   );
   // Remove transfer-encoding since Next.js handles it
@@ -127,9 +134,9 @@ export async function DELETE(
   return proxyRequest(request, context);
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
-    headers: CORS_HEADERS,
+    headers: getCorsHeaders(request.headers.get("origin")),
   });
 }

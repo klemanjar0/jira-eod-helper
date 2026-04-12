@@ -16,7 +16,7 @@ export function SearchBar() {
       params.delete("q");
     }
     router.replace(`${pathname}?${params.toString()}`);
-  }, 1000);
+  }, 300);
 
   return (
     <TextField

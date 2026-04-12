@@ -22,6 +22,12 @@ import HelpOutlineIcon from "@mui/icons-material/HelpOutlined"; // default — �
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { colors, withOpacity } from "@/app/lib/theme";
+import {
+  PRIORITY_COLORS,
+  DEFAULT_PRIORITY_COLOR,
+  STATUS_COLORS,
+  DEFAULT_STATUS_COLOR,
+} from "@/app/lib/constants";
 import { Ticket } from "@/app/models/ticket";
 import { useRouter } from "next/navigation";
 
@@ -41,26 +47,8 @@ const TicketItem: React.FC<Props> = (props) => {
     router.push(`/tickets/${item.id}`);
   };
 
-  const getColor = (status: string) => {
-    switch (status) {
-      case "Resolved":
-        return "#32CD3260"; // mediumseagreen — мягкий зелёный
-      case "To Do":
-        return "#CCCCCC60"; // светло-серый, не слепит, но виден
-      case "In Progress":
-        return "#1E90FF60"; // dodgerblue — яркий, но не кислотный
-      case "Reopened":
-        return "#FF634760"; // tomato — более тёплый красный
-      case "Closed":
-        return "#228B2260"; // forestgreen — глубже, чем resolved
-      case "Story Review":
-        return "#9370DB60"; // medium purple — красиво для review
-      case "In Review":
-        return "#87CEFA60"; // light sky blue — светлый, но читаемый
-      default:
-        return "#88888860"; // дефолт — сероватый
-    }
-  };
+  const getColor = (status: string) =>
+    STATUS_COLORS[status] ?? DEFAULT_STATUS_COLOR;
 
   const getIcon = (status: string) => {
     switch (status) {
@@ -83,22 +71,8 @@ const TicketItem: React.FC<Props> = (props) => {
     }
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "Blocker":
-        return "#FF4C4CFF"; // насыщенный красный, тревожный
-      case "Critical":
-        return "#FF7043FF"; // чуть мягче, но всё ещё срочно
-      case "Major":
-        return "#FFA500FF"; // тёплый оранжевый
-      case "Minor":
-        return "#1E90FFFF"; // приятный синий
-      case "Trivial":
-        return "#AAAAAAFF"; // мягкий серый, почти незаметный
-      default:
-        return "#777777FF"; // на случай undefined
-    }
-  };
+  const getPriorityColor = (priority: string) =>
+    PRIORITY_COLORS[priority] ?? DEFAULT_PRIORITY_COLOR;
 
   const isIncludedToday = today.some((it) => it.id === item.id);
   const isIncludedTomorrow = tomorrow.some((it) => it.id === item.id);

@@ -12,46 +12,20 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { getTicketDetails } from "@/app/actions/tickets";
 import { colors } from "@/app/lib/theme";
+import {
+  PRIORITY_COLORS,
+  DEFAULT_PRIORITY_COLOR,
+  STATUS_COLORS_SOLID,
+  DEFAULT_STATUS_COLOR_SOLID,
+} from "@/app/lib/constants";
 import TicketDescription from "./components/TicketDescription";
 import TicketComments from "./components/TicketComments";
 
-function getPriorityColor(priority: string) {
-  switch (priority) {
-    case "Blocker":
-      return "#FF4C4C";
-    case "Critical":
-      return "#FF7043";
-    case "Major":
-      return "#FFA500";
-    case "Minor":
-      return "#1E90FF";
-    case "Trivial":
-      return "#AAAAAA";
-    default:
-      return "#777777";
-  }
-}
+const getPriorityColor = (priority: string) =>
+  PRIORITY_COLORS[priority] ?? DEFAULT_PRIORITY_COLOR;
 
-function getStatusColor(status: string) {
-  switch (status) {
-    case "Resolved":
-      return "#32CD32";
-    case "To Do":
-      return "#CCCCCC";
-    case "In Progress":
-      return "#1E90FF";
-    case "Reopened":
-      return "#FF6347";
-    case "Closed":
-      return "#228B22";
-    case "Story Review":
-      return "#9370DB";
-    case "In Review":
-      return "#87CEFA";
-    default:
-      return "#888888";
-  }
-}
+const getStatusColor = (status: string) =>
+  STATUS_COLORS_SOLID[status] ?? DEFAULT_STATUS_COLOR_SOLID;
 
 interface PageProps {
   params: Promise<{ id: string }>;
