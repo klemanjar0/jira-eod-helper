@@ -1,12 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState, useTransition } from "react";
 import { UserSettings } from "@/app/models/user";
 import Box from "@mui/material/Box";
 import { Stack } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import SubjectIcon from "@mui/icons-material/Subject";
 import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import { updateUserSettings } from "@/app/actions/user";
+import { useRouter } from "next/navigation";
 
 interface Props {
   userId: string;
@@ -14,15 +17,38 @@ interface Props {
 }
 
 const TicketForm: React.FC<Props> = ({ userId, initialSettings }) => {
-  const [content, setContent] = React.useState(
-    initialSettings.content_template,
-  );
-  const [itemTemplate, setItemTemplate] = React.useState(
+  const router = useRouter();
+  const [content, setContent] = useState(initialSettings.content_template);
+  const [itemTemplate, setItemTemplate] = useState(
     initialSettings.ticket_item_template,
   );
+  const [isPending, startTransition] = useTransition();
+
+  const hasChanges =
+    content !== initialSettings.content_template ||
+    itemTemplate !== initialSettings.ticket_item_template;
+
+  const handleSubmit = (formData: FormData) => {
+    const contentTemplate = formData.get("content_template") as string;
+    const ticketItemTemplate = formData.get("item_template") as string;
+
+    startTransition(async () => {
+      await updateUserSettings(userId, {
+        content_template: contentTemplate,
+        ticket_item_template: ticketItemTemplate,
+      });
+
+      router.refresh();
+    });
+  };
 
   return (
-    <Box component="form" noValidate sx={{ width: "100%" }}>
+    <Box
+      component="form"
+      action={handleSubmit}
+      noValidate
+      sx={{ width: "100%" }}
+    >
       <Stack direction="row" sx={{ gap: 1, marginBottom: 2 }}>
         <SubjectIcon color="primary" />
         <Typography color="primary" sx={{ fontWeight: "bold" }}>
@@ -38,6 +64,7 @@ const TicketForm: React.FC<Props> = ({ userId, initialSettings }) => {
         multiline
         value={content}
         onChange={(e) => setContent(e.target.value)}
+        disabled={isPending}
       />
       <Typography variant="body2" sx={{ marginBottom: 1 }}>
         Use TODAY_TICKET_KEY key to insert tickets list for today. Use
@@ -57,8 +84,20 @@ const TicketForm: React.FC<Props> = ({ userId, initialSettings }) => {
         onChange={(e) => setItemTemplate(e.target.value)}
         multiline
         fullWidth
+        disabled={isPending}
       />
       <input type="hidden" name="item_template" value={itemTemplate} />
+
+      <Button
+        type="submit"
+        variant="contained"
+        fullWidth
+        size="large"
+        disabled={isPending || !hasChanges}
+        sx={{ mb: 2 }}
+      >
+        {isPending ? "Saving..." : "Save"}
+      </Button>
     </Box>
   );
 };
