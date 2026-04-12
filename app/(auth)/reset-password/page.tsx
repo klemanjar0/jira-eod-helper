@@ -15,21 +15,23 @@ import Link from "@mui/material/Link";
 import NextLink from "next/link";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import { login, signup } from "@/app/actions/auth";
+import { resetPassword } from "@/app/actions/auth";
+import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
-  const [isSignUp, setIsSignUp] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   const handleSubmit = (formData: FormData) => {
     setError(null);
     startTransition(async () => {
-      const action = isSignUp ? signup : login;
-      const result = await action(formData);
+      const result = await resetPassword(formData);
       if (result?.error) {
         setError(result.error);
+      } else {
+        router.replace("/");
       }
     });
   };
@@ -47,16 +49,10 @@ export default function LoginPage() {
       <Card sx={{ maxWidth: 400, width: "100%", mx: 2 }} elevation={3}>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-            {isSignUp ? "Create account" : "Sign in"}
+            Set new password
           </Typography>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            sx={{ mb: 3 }}
-          >
-            {isSignUp
-              ? "Enter your email and password to get started.\nUse your Jira email to sign in."
-              : "Enter your credentials to continue."}
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            Enter your new password below.
           </Typography>
 
           {error && (
@@ -67,23 +63,13 @@ export default function LoginPage() {
 
           <Box component="form" action={handleSubmit} noValidate>
             <TextField
-              name="email"
-              label="Email"
-              type="email"
-              autoComplete="email"
+              name="newPassword"
+              label="New password"
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
               required
               fullWidth
               sx={{ mb: 2 }}
-              disabled={isPending}
-            />
-            <TextField
-              name="password"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              autoComplete={isSignUp ? "new-password" : "current-password"}
-              required
-              fullWidth
-              sx={{ mb: 3 }}
               disabled={isPending}
               slotProps={{
                 htmlInput: { minLength: 6 },
@@ -103,6 +89,15 @@ export default function LoginPage() {
                 },
               }}
             />
+            <TextField
+              name="confirmPassword"
+              label="Confirm new password"
+              type={showPassword ? "text" : "password"}
+              required
+              fullWidth
+              sx={{ mb: 3 }}
+              disabled={isPending}
+            />
             <Button
               type="submit"
               variant="contained"
@@ -113,37 +108,17 @@ export default function LoginPage() {
             >
               {isPending ? (
                 <CircularProgress size={24} color="inherit" />
-              ) : isSignUp ? (
-                "Sign up"
               ) : (
-                "Sign in"
+                "Update password"
               )}
             </Button>
           </Box>
 
           <Typography variant="body2" align="center">
-            {isSignUp
-              ? "Already have an account? "
-              : "Don't have an account? "}
-            <Link
-              component="button"
-              variant="body2"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError(null);
-              }}
-            >
-              {isSignUp ? "Sign in" : "Sign up"}
+            <Link component={NextLink} href="/login" variant="body2">
+              Back to sign in
             </Link>
           </Typography>
-
-          {!isSignUp && (
-            <Typography variant="body2" align="center" sx={{ mt: 1 }}>
-              <Link component={NextLink} href="/forgot-password" variant="body2">
-                Forgot password?
-              </Link>
-            </Typography>
-          )}
         </CardContent>
       </Card>
     </Box>

@@ -5,6 +5,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { getCurrentUser } from "@/app/actions/user";
 import { logout } from "@/app/actions/auth";
+import ChangePasswordForm from "./ChangePasswordForm";
 
 export default async function AccountPage() {
   const user = await getCurrentUser();
@@ -35,13 +36,19 @@ export default async function AccountPage() {
 
         <Divider sx={{ my: 1 }} />
 
+        <Typography sx={{ fontWeight: "bold", mt: 1 }} gutterBottom>
+          Change password
+        </Typography>
+        <ChangePasswordForm />
+
+        <Divider sx={{ my: 2 }} />
+
         <Box component="form" action={logout}>
           <Button
             type="submit"
             fullWidth
             variant="outlined"
             color="error"
-            sx={{ mt: 1 }}
           >
             Log out
           </Button>
