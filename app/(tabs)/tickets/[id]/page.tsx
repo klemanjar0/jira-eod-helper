@@ -39,30 +39,6 @@ export default async function TicketDetailsPage({ params }: PageProps) {
     <Box
       sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
-      <AppBar
-        position="static"
-        sx={{
-          borderRadius: 16,
-          marginTop: 1,
-          borderColor: "primary",
-          borderWidth: 1,
-        }}
-      >
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            href="/tickets"
-            aria-label="back"
-          >
-            <ArrowBackIcon />
-          </IconButton>
-          <Typography sx={{ ml: 2, flex: 1 }} variant="h6">
-            {details?.key} Details
-          </Typography>
-        </Toolbar>
-      </AppBar>
-
       {!details ? (
         <Box sx={{ p: 2 }}>
           <Typography>Failed to load ticket details.</Typography>
