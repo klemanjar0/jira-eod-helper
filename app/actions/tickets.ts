@@ -50,7 +50,9 @@ export async function getTickets(query?: string): Promise<TicketResponse> {
     : `AND assignee="${escapedForJira(assignee)}"`;
 
   const issueQueryResult = issueQuery.split(",").join(" AND ");
-  const finalIssueQuery = `AND ${issueQueryResult} order by key DESC`;
+  const finalIssueQuery = issueQueryResult
+    ? `AND ${issueQueryResult} order by key DESC`
+    : "";
 
   jqlArray.push(assignTo, escapedForJira(finalIssueQuery));
 

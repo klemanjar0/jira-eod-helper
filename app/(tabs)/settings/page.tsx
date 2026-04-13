@@ -17,7 +17,11 @@ export default async function SettingsPage() {
   return (
     <Box sx={{ p: 2 }}>
       <Stack>
-        <Typography sx={{ fontWeight: "bold" }} gutterBottom>
+        <Typography
+          sx={{ fontWeight: "bold" }}
+          variant={"h6"}
+          gutterBottom
+        >
           Settings
         </Typography>
         <Divider sx={{ my: 1 }} />

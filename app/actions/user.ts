@@ -13,6 +13,26 @@ function isValidUserId(userId: unknown): userId is string {
   return typeof userId === "string" && UUID_RE.test(userId);
 }
 
+function prepareSettings(object: Partial<UserSettings>) {
+  if (!object) {
+    return {};
+  }
+
+  if ("user_id" in object) {
+    delete object.user_id;
+  }
+
+  if ("created_at" in object) {
+    delete object.created_at;
+  }
+
+  if ("updated_at" in object) {
+    delete object.updated_at;
+  }
+
+  return object;
+}
+
 const userSettingsUpdateSchema = z
   .object({
     project_id: z.string(),
@@ -175,8 +195,10 @@ export async function getUserSettings(
 
 export async function updateUserSettings(
   userId: string,
-  settings: Partial<Omit<UserSettings, "user_id" | "updated_at">>,
+  userSettings: Partial<Omit<UserSettings, "user_id" | "updated_at">>,
 ): Promise<UserSettings | null> {
+  const settings = prepareSettings(userSettings);
+
   if (!isValidUserId(userId)) {
     log.warn("db", "updateUserSettings: invalid userId", {
       userId: String(userId),

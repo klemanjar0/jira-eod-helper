@@ -11,6 +11,7 @@ import TextField from "@mui/material/TextField";
 import { updateUserSettings } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
 import ApiIcon from "@mui/icons-material/Api";
+import { useToast } from "@/app/components/ui/ToastProvider";
 
 interface Props {
   userId: string;
@@ -24,6 +25,7 @@ const MasterKeyForm: React.FC<Props> = ({
   initialSettings,
 }) => {
   const router = useRouter();
+  const { showToast } = useToast();
   const [enabled, setEnabled] = useState(
     initialSettings?.is_using_master_key,
   );
@@ -40,13 +42,18 @@ const MasterKeyForm: React.FC<Props> = ({
     const apiKey = formData.get("api_key") as string;
 
     startTransition(async () => {
-      await updateUserSettings(userId, {
+      const result = await updateUserSettings(userId, {
         ...initialSettings,
         is_using_master_key: isUsingMasterKey,
         api_key: isUsingMasterKey ? "" : apiKey,
       });
 
-      router.refresh();
+      if (!result) {
+        showToast("Failed to save API configuration. Please try again.", "error");
+      } else {
+        showToast("API configuration saved.", "success");
+        router.refresh();
+      }
     });
   };
 

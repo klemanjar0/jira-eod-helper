@@ -70,7 +70,7 @@ const JQLSearchField: React.FC<Props> = ({ value, onChange }) => {
       ))}
       <Stack direction="row" spacing={2}>
         <Button
-          variant="contained"
+          variant="outlined"
           sx={{ mt: 1 }}
           onClick={onAddRow}
           fullWidth

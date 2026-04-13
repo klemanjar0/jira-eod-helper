@@ -13,7 +13,8 @@ const defaultTicketTemplate = `
 const defaultQuery = "status!=Closed,status!=Testing",
   defaultSubject = "Developer FE;myTI",
   defaultMailRecipient = "my.eod@trialinteractive.com",
-  defaultAssignee = "AND assignee = currentUser()";
+  defaultAssignee = "Sufiya Sultana",
+  defaultUsername = "Sufiya Sultana";
 
 export const appConstants = {
   defaultMailContent,
@@ -22,6 +23,7 @@ export const appConstants = {
   defaultSubject,
   defaultMailRecipient,
   defaultQuery,
+  defaultUsername,
 };
 
 /** Jira priority → hex color */

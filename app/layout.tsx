@@ -4,6 +4,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v16-appRouter";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import theme from "@/app/lib/theme";
+import { ToastProvider } from "@/app/components/ui/ToastProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,7 +23,9 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <div className="app-container">{children}</div>
+            <ToastProvider>
+              <div className="app-container">{children}</div>
+            </ToastProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>

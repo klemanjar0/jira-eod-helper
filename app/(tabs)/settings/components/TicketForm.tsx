@@ -10,6 +10,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import { updateUserSettings } from "@/app/actions/user";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/app/components/ui/ToastProvider";
 
 interface Props {
   userId: string;
@@ -18,6 +19,7 @@ interface Props {
 
 const TicketForm: React.FC<Props> = ({ userId, initialSettings }) => {
   const router = useRouter();
+  const { showToast } = useToast();
   const [content, setContent] = useState(initialSettings.content_template);
   const [itemTemplate, setItemTemplate] = useState(
     initialSettings.ticket_item_template,
@@ -33,13 +35,21 @@ const TicketForm: React.FC<Props> = ({ userId, initialSettings }) => {
     const ticketItemTemplate = formData.get("item_template") as string;
 
     startTransition(async () => {
-      await updateUserSettings(userId, {
+      const result = await updateUserSettings(userId, {
         ...initialSettings,
         content_template: contentTemplate,
         ticket_item_template: ticketItemTemplate,
       });
 
-      router.refresh();
+      if (!result) {
+        showToast(
+          "Failed to save email template. Please try again.",
+          "error",
+        );
+      } else {
+        showToast("Email template saved.", "success");
+        router.refresh();
+      }
     });
   };
 

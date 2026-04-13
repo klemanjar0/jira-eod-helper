@@ -7,6 +7,7 @@ import { updateUserSettings } from "@/app/actions/user";
 import { UserSettings } from "@/app/models/user";
 import { appConstants } from "@/app/lib/constants";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/app/components/ui/ToastProvider";
 
 interface Props {
   userId: string;
@@ -15,8 +16,9 @@ interface Props {
 
 const ResetForm: React.FC<Props> = ({ userId, initialSettings }) => {
   const router = useRouter();
+  const { showToast } = useToast();
   const handleSubmit = async () => {
-    await updateUserSettings(userId, {
+    const result = await updateUserSettings(userId, {
       ...initialSettings,
       issue_query: appConstants.defaultQuery,
       ticket_item_template: appConstants.defaultTicketTemplate,
@@ -24,8 +26,17 @@ const ResetForm: React.FC<Props> = ({ userId, initialSettings }) => {
       mail_subject: appConstants.defaultSubject,
       mail_recipient: appConstants.defaultMailRecipient,
       assignee: appConstants.defaultAssignee,
+      is_using_master_key: true,
+      assignee_is_current_user: true,
+      username: appConstants.defaultUsername,
     });
-    router.refresh();
+
+    if (!result) {
+      showToast("Failed to reset settings. Please try again.", "error");
+    } else {
+      showToast("Settings reset to defaults.", "success");
+      router.refresh();
+    }
   };
   return (
     <Box component="form" action={handleSubmit} noValidate>

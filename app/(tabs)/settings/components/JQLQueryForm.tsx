@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import SpellcheckIcon from "@mui/icons-material/Spellcheck";
 import IOSSwitch from "@/app/components/ui/IOSSwitch";
 import JQLSearchField from "@/app/(tabs)/settings/components/JQLSearchField";
+import { useToast } from "@/app/components/ui/ToastProvider";
 
 interface Props {
   userId: string;
@@ -18,6 +19,7 @@ interface Props {
 
 const JQLQueryForm: React.FC<Props> = ({ userId, initialSettings }) => {
   const router = useRouter();
+  const { showToast } = useToast();
   const [jql, setJql] = useState(initialSettings.issue_query);
   const [useCurrentUser, _setUseCurrentUser] = useState<boolean>(
     initialSettings.assignee_is_current_user,
@@ -45,13 +47,22 @@ const JQLQueryForm: React.FC<Props> = ({ userId, initialSettings }) => {
       formData.get("is_using_current_user") === "true";
 
     startTransition(async () => {
-      await updateUserSettings(userId, {
+      const result = await updateUserSettings(userId, {
         ...initialSettings,
         issue_query: jql_query,
         assignee: assignee_query,
         assignee_is_current_user: is_using_current_user,
       });
-      router.refresh();
+
+      if (!result) {
+        showToast(
+          "Failed to save JQL configuration. Please try again.",
+          "error",
+        );
+      } else {
+        showToast("JQL configuration saved.", "success");
+        router.refresh();
+      }
     });
   };
 
@@ -79,7 +90,7 @@ const JQLQueryForm: React.FC<Props> = ({ userId, initialSettings }) => {
             />
           }
           label="Use Current User"
-          sx={{ mb: 1 }}
+          sx={{ mb: 2 }}
         />
         <input
           type="hidden"

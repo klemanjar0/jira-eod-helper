@@ -10,6 +10,7 @@ export interface UserSettings {
   assignee: string;
   username: string;
   is_using_master_key: boolean;
+  created_at: string;
   updated_at: string;
   api_key: string;
   assignee_is_current_user: boolean;

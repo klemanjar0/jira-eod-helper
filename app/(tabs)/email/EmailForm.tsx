@@ -12,6 +12,7 @@ import { buildEmailURI } from "@/app/lib/utils";
 import { TicketType, useTicketsStore } from "@/app/stores/tickets";
 import { useRouter } from "next/navigation";
 import { updateUserSettings } from "@/app/actions/user";
+import { useToast } from "@/app/components/ui/ToastProvider";
 
 interface Props {
   userId: string;
@@ -28,16 +29,26 @@ const EmailForm: React.FC<Props> = ({ settings, initialDate, userId }) => {
   const [name, setName] = useState(settings.username ?? "");
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const { showToast } = useToast();
 
   const nameChanged = name !== (settings.username ?? "");
 
   const handleSubmitName = () => {
     startTransition(async () => {
-      await updateUserSettings(userId, {
+      const result = await updateUserSettings(userId, {
         ...settings,
         username: name,
       });
-      router.refresh();
+
+      if (!result) {
+        showToast(
+          "Failed to save author name. Please try again.",
+          "error",
+        );
+      } else {
+        showToast("Author name saved.", "success");
+        router.refresh();
+      }
     });
   };
 
@@ -82,6 +93,7 @@ const EmailForm: React.FC<Props> = ({ settings, initialDate, userId }) => {
         flexDirection: "column",
         flex: 1,
         padding: 1,
+        paddingTop: 2,
         maxWidth: MAX_WIDTH,
         margin: "auto",
       }}
