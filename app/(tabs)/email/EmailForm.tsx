@@ -36,7 +36,6 @@ const EmailForm: React.FC<Props> = ({ settings, initialDate, userId }) => {
   const handleSubmitName = () => {
     startTransition(async () => {
       const result = await updateUserSettings(userId, {
-        ...settings,
         username: name,
       });
 

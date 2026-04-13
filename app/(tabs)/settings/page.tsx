@@ -44,7 +44,7 @@ export default async function SettingsPage() {
           initialSettings={settings}
         />
         <Divider sx={{ my: 1 }} />
-        <ResetForm userId={user.id} initialSettings={settings} />
+        <ResetForm userId={user.id} />
       </Stack>
     </Box>
   );

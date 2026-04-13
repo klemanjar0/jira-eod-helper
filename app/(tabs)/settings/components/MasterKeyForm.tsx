@@ -43,13 +43,15 @@ const MasterKeyForm: React.FC<Props> = ({
 
     startTransition(async () => {
       const result = await updateUserSettings(userId, {
-        ...initialSettings,
         is_using_master_key: isUsingMasterKey,
         api_key: isUsingMasterKey ? "" : apiKey,
       });
 
       if (!result) {
-        showToast("Failed to save API configuration. Please try again.", "error");
+        showToast(
+          "Failed to save API configuration. Please try again.",
+          "error",
+        );
       } else {
         showToast("API configuration saved.", "success");
         router.refresh();

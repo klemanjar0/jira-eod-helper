@@ -5,6 +5,9 @@ import { Ticket } from "@/app/models/ticket";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { SearchBar } from "@/app/(tabs)/tickets/components/SearchBar";
+import { Stack } from "@mui/material";
+import ProjectField from "@/app/(tabs)/tickets/components/ProjectField";
+import { getCurrentUser, getUserSettings } from "@/app/actions/user";
 
 export default async function TicketsPage({
   searchParams,
@@ -14,6 +17,14 @@ export default async function TicketsPage({
   const { q } = await searchParams;
   const query = typeof q === "string" ? q : undefined;
   const res = await getTickets(query);
+  const user = await getCurrentUser();
+
+  if (!user) return <Box sx={{ p: 2 }}>Not signed in.</Box>;
+
+  const settings = await getUserSettings(user?.id);
+
+  if (!settings) return <Box sx={{ p: 2 }}>Error reading settings.</Box>;
+
   const tickets: Ticket[] = res.tickets;
 
   const renderTicket = (item: Ticket) => (
@@ -29,7 +40,10 @@ export default async function TicketsPage({
         flex: 1,
       }}
     >
-      <SearchBar />
+      <Stack direction="row" spacing={2} sx={{ my: 1 }}>
+        <ProjectField userId={user.id} projectId={settings.project_id} />
+        <SearchBar />
+      </Stack>
 
       {tickets.length === 0 ? (
         <Box

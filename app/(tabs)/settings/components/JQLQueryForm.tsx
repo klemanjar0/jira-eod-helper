@@ -48,7 +48,6 @@ const JQLQueryForm: React.FC<Props> = ({ userId, initialSettings }) => {
 
     startTransition(async () => {
       const result = await updateUserSettings(userId, {
-        ...initialSettings,
         issue_query: jql_query,
         assignee: assignee_query,
         assignee_is_current_user: is_using_current_user,

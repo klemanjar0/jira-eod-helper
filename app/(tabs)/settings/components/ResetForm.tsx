@@ -11,15 +11,13 @@ import { useToast } from "@/app/components/ui/ToastProvider";
 
 interface Props {
   userId: string;
-  initialSettings: UserSettings;
 }
 
-const ResetForm: React.FC<Props> = ({ userId, initialSettings }) => {
+const ResetForm: React.FC<Props> = ({ userId }) => {
   const router = useRouter();
   const { showToast } = useToast();
   const handleSubmit = async () => {
     const result = await updateUserSettings(userId, {
-      ...initialSettings,
       issue_query: appConstants.defaultQuery,
       ticket_item_template: appConstants.defaultTicketTemplate,
       content_template: appConstants.defaultMailContent,
