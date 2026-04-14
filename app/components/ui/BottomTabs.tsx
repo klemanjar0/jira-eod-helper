@@ -3,12 +3,17 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BottomNavigation, BottomNavigationAction } from "@mui/material";
+import {
+  Badge,
+  BottomNavigation,
+  BottomNavigationAction,
+} from "@mui/material";
 import SettingsIcon from "@mui/icons-material/Settings";
 import AppsIcon from "@mui/icons-material/Apps";
 import PortraitIcon from "@mui/icons-material/Portrait";
 import EmailIcon from "@mui/icons-material/Email";
 import { BOTTOM_NAVBAR_HEIGHT } from "@/app/lib/theme";
+import { TicketType, useTicketsStore } from "@/app/stores/tickets";
 
 const tabs = [
   { value: "/tickets", label: "Tickets", icon: <AppsIcon /> },
@@ -19,6 +24,14 @@ const tabs = [
 
 const BottomTabs: React.FC = () => {
   const pathname = usePathname();
+  const total = useTicketsStore(
+    (state) =>
+      state[TicketType.Today].length + state[TicketType.Tomorrow].length,
+  );
+  const fulfilled = useTicketsStore(
+    (state) =>
+      state[TicketType.Today].length && state[TicketType.Tomorrow].length,
+  );
 
   const activeTab =
     tabs.find((t) => pathname.startsWith(t.value))?.value ?? false;
@@ -42,7 +55,18 @@ const BottomTabs: React.FC = () => {
           key={tab.value}
           value={tab.value}
           label={tab.label}
-          icon={tab.icon}
+          icon={
+            tab.label === "Email" && total > 0 ? (
+              <Badge
+                badgeContent={total}
+                color={fulfilled ? "success" : "primary"}
+              >
+                {tab.icon}
+              </Badge>
+            ) : (
+              tab.icon
+            )
+          }
           component={Link}
           href={tab.value}
         />

@@ -9,6 +9,7 @@ import {
   Card,
   Chip,
   Divider,
+  Link,
   Stack,
   Typography,
 } from "@mui/material";
@@ -30,23 +31,18 @@ import {
 } from "@/app/lib/constants";
 import { Ticket } from "@/app/models/ticket";
 import { useRouter } from "next/navigation";
+import NextLink from "next/link";
 
 interface Props {
   item: Ticket;
 }
 
 const TicketItem: React.FC<Props> = (props) => {
-  const router = useRouter();
   const today = useTicketsStore((state) => state[TicketType.Today]);
   const tomorrow = useTicketsStore((state) => state[TicketType.Tomorrow]);
   const toggle = useTicketsStore((state) => state.toggle);
 
   const { item } = props;
-
-  const onGoToDetails = () => {
-    router.push(`/tickets/${item.id}`);
-  };
-
   const getColor = (status: string) =>
     STATUS_COLORS[status] ?? DEFAULT_STATUS_COLOR;
 
@@ -185,6 +181,10 @@ const TicketItem: React.FC<Props> = (props) => {
                 <Divider sx={{ marginTop: 0.5, marginBottom: 0.5 }} />
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                   {item.summary}
+                  <br />
+                  <Link href={`/tickets/${item.id}`} component={NextLink}>
+                    Show More...
+                  </Link>
                 </Typography>
               </Stack>
             </Box>
@@ -215,15 +215,6 @@ const TicketItem: React.FC<Props> = (props) => {
                 Tomorrow
               </Button>
             </ButtonGroup>
-
-            <Button
-              variant={"outlined"}
-              onClick={onGoToDetails}
-              key="tehwrh"
-              size={"small"}
-            >
-              Details
-            </Button>
           </Stack>
         </Stack>
       </Card>
