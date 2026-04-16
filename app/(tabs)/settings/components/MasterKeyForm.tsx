@@ -104,6 +104,15 @@ const MasterKeyForm: React.FC<Props> = ({
               disabled={isPending}
             />
           </Box>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ display: "block", mb: 1 }}
+          >
+            Your API key is encrypted with AES-256-GCM before being stored
+            — it is never saved in plaintext and cannot be read by anyone
+            without the server-side secret.
+          </Typography>
           <input type="hidden" name="api_key" value={apiKey} />
         </>
       ) : null}

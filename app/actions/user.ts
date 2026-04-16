@@ -5,6 +5,63 @@ import { log } from "@/app/lib/logger";
 import type { UserSettings } from "@/app/models/user";
 import { User } from "@supabase/auth-js";
 import { z } from "zod";
+import {
+  createCipheriv,
+  createDecipheriv,
+  createHash,
+  randomBytes,
+} from "crypto";
+
+// ---------------------------------------------------------------------------
+// API-key encryption helpers (AES-256-GCM)
+// ---------------------------------------------------------------------------
+// The encryption key is derived by SHA-256 hashing SUPABASE_ACCESS_TOKEN so
+// it is always exactly 32 bytes regardless of token length.
+// Stored format: <iv_hex>:<authTag_hex>:<ciphertext_hex>
+// ---------------------------------------------------------------------------
+
+function getEncryptionKey(): Buffer {
+  const token = process.env.SUPABASE_ACCESS_TOKEN;
+  if (!token) {
+    throw new Error(
+      "SUPABASE_ACCESS_TOKEN env var is not set — cannot encrypt api_key",
+    );
+  }
+  return createHash("sha256").update(token).digest();
+}
+
+function encryptApiKey(plaintext: string): string {
+  const key = getEncryptionKey();
+  const iv = randomBytes(12); // 96-bit IV recommended for GCM
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const encrypted = Buffer.concat([
+    cipher.update(plaintext, "utf8"),
+    cipher.final(),
+  ]);
+  const authTag = cipher.getAuthTag();
+  return `${iv.toString("hex")}:${authTag.toString("hex")}:${encrypted.toString("hex")}`;
+}
+
+function decryptApiKey(stored: string): string {
+  const parts = stored.split(":");
+  if (parts.length !== 3) {
+    // Not in our encrypted format — return as-is (migration safety for
+    // any plaintext values that existed before encryption was introduced).
+    return stored;
+  }
+  const [ivHex, authTagHex, ciphertextHex] = parts;
+  const key = getEncryptionKey();
+  const decipher = createDecipheriv(
+    "aes-256-gcm",
+    key,
+    Buffer.from(ivHex, "hex"),
+  );
+  decipher.setAuthTag(Buffer.from(authTagHex, "hex"));
+  return (
+    decipher.update(Buffer.from(ciphertextHex, "hex")).toString("utf8") +
+    decipher.final("utf8")
+  );
+}
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -183,7 +240,23 @@ export async function getUserSettings(
     }
 
     log.debug("db", "getUserSettings: ok", { userId });
-    return data as UserSettings;
+
+    const settings = data as UserSettings;
+
+    // Decrypt the api_key if present so callers always receive plaintext.
+    if (settings.api_key) {
+      try {
+        settings.api_key = decryptApiKey(settings.api_key);
+      } catch (err) {
+        log.error("db", "getUserSettings: api_key decryption failed", {
+          userId,
+          message: err instanceof Error ? err.message : String(err),
+        });
+        settings.api_key = "";
+      }
+    }
+
+    return settings;
   } catch (err) {
     log.error("db", "getUserSettings: unexpected exception", {
       userId,
@@ -247,13 +320,29 @@ export async function updateUserSettings(
 
   log.debug("db", "updateUserSettings: start", { userId, fields });
 
+  // Encrypt the api_key before persisting so it is never stored in plaintext.
+  // An empty string means "clear the key" — store it as-is rather than
+  // encrypting a blank value.
+  const payload: typeof parsed.data = { ...parsed.data };
+  if ("api_key" in payload && payload.api_key) {
+    try {
+      payload.api_key = encryptApiKey(payload.api_key);
+    } catch (err) {
+      log.error("db", "updateUserSettings: api_key encryption failed", {
+        userId,
+        message: err instanceof Error ? err.message : String(err),
+      });
+      return null;
+    }
+  }
+
   try {
     const supabase = await createClient();
     const { data, error } = await supabase
       .from("user_settings")
       .upsert({
         user_id: userId,
-        ...parsed.data,
+        ...payload,
         updated_at: new Date().toISOString(),
       })
       .select()
