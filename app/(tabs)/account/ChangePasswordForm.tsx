@@ -28,7 +28,11 @@ export default function ChangePasswordForm() {
         setError(result.error);
       } else {
         setSuccess(true);
-        (document.getElementById("change-password-form") as HTMLFormElement)?.reset();
+        (
+          document.getElementById(
+            "change-password-form",
+          ) as HTMLFormElement
+        )?.reset();
       }
     });
   };
@@ -52,6 +56,7 @@ export default function ChangePasswordForm() {
       )}
 
       <TextField
+        size="small"
         name="currentPassword"
         label="Current password"
         type={showCurrent ? "text" : "password"}
@@ -77,6 +82,7 @@ export default function ChangePasswordForm() {
         }}
       />
       <TextField
+        size="small"
         name="newPassword"
         label="New password"
         type={showNew ? "text" : "password"}
@@ -103,6 +109,7 @@ export default function ChangePasswordForm() {
         }}
       />
       <TextField
+        size="small"
         name="confirmPassword"
         label="Confirm new password"
         type={showNew ? "text" : "password"}
@@ -118,7 +125,11 @@ export default function ChangePasswordForm() {
         fullWidth
         disabled={isPending}
       >
-        {isPending ? <CircularProgress size={20} color="inherit" /> : "Change password"}
+        {isPending ? (
+          <CircularProgress size={20} color="inherit" />
+        ) : (
+          "Change password"
+        )}
       </Button>
     </Box>
   );
