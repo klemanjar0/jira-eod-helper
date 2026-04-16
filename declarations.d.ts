@@ -12,3 +12,5 @@ declare type Nullable<T> = T | null;
 declare type SearchParams = Promise<{
   [key: string]: string | string[] | undefined;
 }>;
+
+declare type VoidCallback = () => void;

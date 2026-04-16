@@ -28,3 +28,21 @@ export const useTicketsStore = create<TicketsStore>((set) => ({
       [TicketType.Tomorrow]: [],
     })),
 }));
+
+type TicketsFetchingStore = {
+  fetching: boolean;
+  start: VoidCallback;
+  stop: VoidCallback;
+};
+
+export const useTicketsFetching = create<TicketsFetchingStore>((set) => ({
+  fetching: false,
+  start: () =>
+    set(() => ({
+      fetching: true,
+    })),
+  stop: () =>
+    set(() => ({
+      fetching: false,
+    })),
+}));
